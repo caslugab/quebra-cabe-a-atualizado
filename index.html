@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quebra-Cabeça de Coração</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        #heart-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        #heart {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+            clip-path: polygon(50% 0%, 100% 35%, 80% 100%, 50% 80%, 20% 100%, 0% 35%);
+        }
+
+        #missing-piece {
+            position: absolute;
+            top: 40%;
+            left: 35%;
+            width: 50px;
+            height: 50px;
+            background-color: #f0f0f0;
+            clip-path: polygon(50% 0%, 100% 35%, 80% 100%, 50% 80%, 20% 100%, 0% 35%);
+        }
+
+        #piece {
+            margin-top: 30px;
+            width: 50px;
+            height: 50px;
+            background-color: pink;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            line-height: 50px;
+            cursor: grab;
+            clip-path: polygon(50% 0%, 100% 35%, 80% 100%, 50% 80%, 20% 100%, 0% 35%);
+            position: absolute;
+            top: 400px; /* Posição inicial */
+            left: 45%; /* Posição inicial */
+        }
+
+        #piece.dragging {
+            opacity: 0.7;
+            cursor: grabbing;
+        }
+    </style>
+</head>
+<body>
+    <div id="heart-container">
+        <div id="heart"></div>
+        <div id="missing-piece"></div>
+    </div>
+    <div id="piece" draggable="true">YOU</div>
+
+    <script>
+        const piece = document.getElementById('piece');
+        const heartContainer = document.getElementById('heart-container');
+        const missingPiece = document.getElementById('missing-piece');
+
+        let offsetX, offsetY;
+
+        piece.addEventListener('dragstart', (e) => {
+            piece.classList.add('dragging');
+            offsetX = e.offsetX;
+            offsetY = e.offsetY;
+        });
+
+        piece.addEventListener('dragend', (e) => {
+            piece.classList.remove('dragging');
+            const pieceRect = piece.getBoundingClientRect();
+            const missingRect = missingPiece.getBoundingClientRect();
+
+            // Verifica se a peça foi solta na posição correta
+            if (
+                pieceRect.left >= missingRect.left &&
+                pieceRect.right <= missingRect.right &&
+                pieceRect.top >= missingRect.top &&
+                pieceRect.bottom <= missingRect.bottom
+            ) {
+                piece.style.left = `${missingRect.left - heartContainer.getBoundingClientRect().left}px`;
+                piece.style.top = `${missingRect.top - heartContainer.getBoundingClientRect().top}px`;
+                piece.style.cursor = 'default';
+                piece.draggable = false;
+                document.getElementById('heart').style.backgroundColor = 'red';
+            } else {
+                // Restaura a posição inicial
+                piece.style.top = '400px';
+                piece.style.left = '45%';
+            }
+        });
+
+        document.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+    </script>
+</body>
+</html>
